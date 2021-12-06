@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Geoviz Final Dynamic</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+</head>
+<body>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.css" type="text/css">
+<style>
+    #menu {
+        background: #fff;
+        position: absolute;
+        z-index: 1;
+        top: 100px;
+        right: 10px;
+        border-radius: 3px;
+        width: 120px;
+        border: 1px solid rgba(0, 0, 0, 0.4);
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    #menu a {
+        font-size: 13px;
+        color: #404040;
+        display: block;
+        margin: 0;
+        padding: 0;
+        padding: 10px;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+        text-align: center;
+    }
+
+    #menu a:last-child {
+        border: none;
+    }
+
+    #menu a:hover {
+        background-color: #f8f8f8;
+        color: #404040;
+    }
+
+    #menu a.active {
+        background-color: #3887be;
+        color: #ffffff;
+    }
+
+    #menu a.active:hover {
+        background: #3074a4;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    h2,
+    h3 {
+      margin: 10px;
+      font-size: 1.2em;
+    }
+    h3 {
+      font-size: 1em;
+    }
+    p {
+      font-size: 0.85em;
+      margin: 10px;
+      text-align: left;
+    }
+    .map-overlay {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.8);
+      margin-right: 20px;
+      font-family: Arial, sans-serif;
+      overflow: auto;
+      border-radius: 3px;
+    }
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+
+    #legend {
+      padding: 10px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      line-height: 18px;
+      height: 50px;
+      margin-bottom: 40px;
+      width: 140px;
+    }
+    .legend-key {
+      display: inline-block;
+      border-radius: 20%;
+      width: 10px;
+      height: 10px;
+      margin-right: 5px;
+    }
+
+    #features {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 25%;
+        overflow: auto;
+        background: rgba(255, 255, 255, 0.8);
+    }
+
+    /* .mapboxg1-control-container .mapboxg1-ctrl-bottom-right {
+        right: 50px !important;
+    } */
+
+    /* .mapboxg1-control-container .mapboxg1-ctrl-top-left {
+    left: 50px;
+    } */
+
+</style>
+</head>
+<body>
+<div id="map"></div>
+<pre id="features"></pre>
+<nav id="menu"></nav>
+
+</div>
+<div class="map-overlay" id="legend"></div>
+
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1Ijoic3RmcmFuMjIiLCJhIjoiY2t2aDhtYWQ1Yzk0dTJxcTZlNzBrdnAyOCJ9.M8ZkVvIGGLbcwREFJmaBBA';
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        zoom: 10,
+        center: [-75.1652, 39.9526],
+        maxBounds: [[-75.929260,39.584524],[-73.898163,40.500225]]
+    });
+
+	map.on('load', () => {
+		map.addSource('callery_pears', {
+			type: 'geojson',
+			// Use a URL for the value for the `data` property.
+			data: 'callery_pears.geojson'
+		});
+
+		// Add a new layer to visualize the polygon.
+		map.addLayer({
+			'id': 'Callery Pear',
+			'type': 'circle',
+			'source': 'callery_pears', // reference the data source
+            'paint' : {
+                'circle-color' : '#50846e',
+                'circle-radius' : 5
+            }
+		});
+        map.addSource('heaven', {
+			type: 'geojson',
+			// Use a URL for the value for the `data` property.
+			data: 'heaven.geojson'
+		});
+		map.addLayer({
+			'id': 'Tree of Heaven',
+			'type': 'circle',
+			'source': 'heaven',
+            'paint' : {
+                'circle-color' : '#8e635e',
+                'circle-radius' : 5
+            }
+			});
+    });
+
+    // After the last frame rendered before the map enters an "idle" state.
+    map.on('idle', () => {
+        // If these two layers were not added to the map, abort
+        if (!map.getLayer('Callery Pear') || !map.getLayer('Tree of Heaven')) {
+            return;
+        }
+
+        // Enumerate ids of the layers.
+        const toggleableLayerIds = ['Callery Pear', 'Tree of Heaven'];
+
+        // Set up the corresponding toggle button for each layer.
+        for (const id of toggleableLayerIds) {
+            // Skip layers that already have a button set up.
+            if (document.getElementById(id)) {
+                continue;
+            }
+
+            // Create a link.
+            const link = document.createElement('a');
+            link.id = id;
+            link.href = '#';
+            link.textContent = id;
+            link.className = 'active';
+
+            // Show or hide layer when the toggle is clicked.
+            link.onclick = function (e) {
+                const clickedLayer = this.textContent;
+                e.preventDefault();
+                e.stopPropagation();
+
+                const visibility = map.getLayoutProperty(
+                    clickedLayer,
+                    'visibility'
+                );
+
+                // Toggle layer visibility by changing the layout object's visibility property.
+                if (visibility === 'visible') {
+                    map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                    this.className = '';
+                } else {
+                    this.className = 'active';
+                    map.setLayoutProperty(
+                        clickedLayer,
+                        'visibility',
+                        'visible'
+                    );
+                }
+            };
+
+            const layers = document.getElementById('menu');
+            layers.appendChild(link);
+        }
+    });
+
+
+    // add legend to your map
+    var layers = ['Callery Pear', 'Tree of Heaven'];
+        var colors = ['#50846e', '#8e635e'];
+
+    for (i = 0; i < layers.length; i++) {
+        var layer = layers[i];
+        var color = colors[i];
+        var item = document.createElement('div');
+        var key = document.createElement('span');
+        key.className = 'legend-key';
+        key.style.backgroundColor = color;var value = document.createElement('span');
+        value.innerHTML = layer;
+        item.appendChild(key);
+        item.appendChild(value);
+        legend.appendChild(item);
+    }
+
+    map.on('click',  (e) => {
+        const features = map.queryRenderedFeatures(e.point);
+
+        // Limit the number of properties we're displaying for
+        // legibility and performance
+        const displayProperties = [
+            'properties',
+
+        ];
+
+        const displayFeatures = features.map((feat) => {
+            const displayFeat = {};
+            displayProperties.forEach((prop) => {
+                displayFeat[prop] = feat[prop];
+            });
+            return displayFeat;
+        });
+
+        // Write object as string with an indent of two spaces.
+        document.getElementById('features').innerHTML = JSON.stringify(
+            displayFeatures,
+            null,
+            2
+        );
+    });
+
+    
+
+    map.addControl(
+        new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        zoom: 14,
+        placeholder: 'Search Address',
+        mapboxgl: mapboxgl,
+        bbox: [-75.929260,39.584524,-73.898163,40.500225],
+        })
+    );
+
+
+</script>
+
+</body>
+</html>

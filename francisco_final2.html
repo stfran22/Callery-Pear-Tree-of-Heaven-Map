@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Display a map</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css" rel="stylesheet" /><style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    h2,
+    h3 {
+      margin: 10px;
+      font-size: 1.2em;
+    }
+    h3 {
+      font-size: 1em;
+    }
+    p {
+      font-size: 0.85em;
+      margin: 10px;
+      text-align: left;
+    }
+    .map-overlay {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.8);
+      margin-right: 20px;
+      font-family: Arial, sans-serif;
+      overflow: auto;
+      border-radius: 3px;
+    }
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+    #features {
+      top: 0;
+      height: 100px;
+      margin-top: 20px;
+      width: 250px;
+    }
+    #legend {
+      padding: 10px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      line-height: 18px;
+      height: 40px;
+      margin-bottom: 40px;
+      width: 135px;
+    }
+    .legend-key {
+      display: inline-block;
+      border-radius: 20%;
+      width: 10px;
+      height: 10px;
+      margin-right: 5px;
+    }</style>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="map-overlay" id="features">
+    <h2>Building footprint map</h2>
+    <div id="pd"><p>The building id is</p></div>
+  </div>
+  <div class="map-overlay" id="legend"></div><script></script></body>
+  <script>
+  mapboxgl.accessToken = 'pk.eyJ1Ijoic3RmcmFuMjIiLCJhIjoiY2t2aDhtYWQ1Yzk0dTJxcTZlNzBrdnAyOCJ9.M8ZkVvIGGLbcwREFJmaBBA'; 
+    var map1 = new mapboxgl.Map({
+        container: "map",
+        style: "mapbox://styles/stfran22/ckwjh48ya1xf014p883nq4pro",
+        zoom: 10,
+        center: [-75.150996, 39.992945]
+    });
+
+
+
+    // add legend to your map
+    var layers = ['Tree of Heaven', 'Callery Pear'];
+    var colors = ['#d69200', '#76a163'];
+for (i = 0; i < layers.length; i++) {
+      var layer = layers[i];
+      var color = colors[i];
+      var item = document.createElement('div');
+      var key = document.createElement('span');
+      key.className = 'legend-key';
+      key.style.backgroundColor = color;
+var value = document.createElement('span');
+      value.innerHTML = layer;
+      item.appendChild(key);
+      item.appendChild(value);
+      legend.appendChild(item);
+    }
+
+
+
+    
+</script>
+</html>
+
